@@ -26,6 +26,26 @@
 						that ran onload for Lab 5.  We are doing the same kind of operations we had in Lab 5, but we are instead having
 						everything handled via server-side scriptes
 			-->
+			<%
+			if(game_info){
+				var rows = '';
+				game_info.forEach(function(game){
+					rows +="<tr>";
+					rows +="<td>"+game.game_date.toDateString()+"</td>";
+					rows +="<td>"+game.visitor_name+"</td>";
+					rows +="<td>"+game.home_score+"</td>";
+					rows +="<td>"+game.visitor_score+"</td>";
+					rows +="<td>";
+					if(game.home_score > game.visitor_score){
+						rows += "Univ. of Colorado Boulder";
+					}else{
+						rows += game.visitor_name;
+					}
+					rows += "</td>";
+					rows +="</tr>";
+				}); %>
+			<%- rows %>
+			<% } %>
 			
 		</table>
 		<br>
@@ -36,9 +56,23 @@
 			</tr>
 			<tr>
 				<td> <!-- TODO: Display the total number of wins here.  
-							    This value should come from your server.js files query, don't calculate it in this file! --></td>
+							    This value should come from your server.js files query, don't calculate it in this file! -->
+					<% 
+					if (wins){
+					%>
+						<%- wins[0].count %>
+					<% } %>
+
+				</td>
 				<td> <!-- TODO: Display the total number of losses here.  
-							    This value should come from your server.js files query, don't calculate it in this file! --></td>
+							    This value should come from your server.js files query, don't calculate it in this file! -->
+
+					<% 
+					if (losses){
+					%>
+						<%- losses[0].count %>
+					<% } %>
+			    </td>
 			</tr>
 		</table>
 		

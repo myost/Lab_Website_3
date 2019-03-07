@@ -27,7 +27,7 @@ const dbConfig = {
 	port: 5432,
 	database: 'football_db',
 	user: 'postgres',
-	password: 'pwd'
+	password: 'myost'
 };
 
 var db = pgp(dbConfig);
@@ -96,7 +96,162 @@ app.get('/register', function(req, res) {
 });
 
 /*Add your other get/post request handlers below here: */
+//home page - get request
 
+// app.get('/home', function(req, res){
+// 	res.render('pages/home',{
+// 		my_title:'Home Page',
+// 		color: 'FF0000',
+// 		color_msg: 'The Color Red'
+// 	});
+// });
+app.get('/home', function(req, res) {
+	var query = 'select * from favorite_colors;';
+	db.any(query)
+        .then(function (rows) {
+            res.render('pages/home',{
+				my_title: "Home Page",
+				data: rows,
+				color: '',
+				color_msg: ''
+			})
+
+        })
+        .catch(function (err) {
+            // display error message in case an error
+            request.flash('error', err);
+            result.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+        })
+});
+
+//home/pick-color - get request
+app.get('/home/pick_color', function(req, res) {
+	var color_choice = req.query.color_selection;
+	var color_options =  'select * from favorite_colors;';
+	var color_message = "select color_msg from favorite_colors where hex_value = '" + color_choice + "';"; 
+	db.task('get-everything', task => {
+        return task.batch([
+            task.any(color_options),
+            task.any(color_message)
+        ]);
+    })
+    .then(info => {
+    	res.render('pages/home',{
+				my_title: "Home Page",
+				data: info[0],
+				color: color_choice,
+				color_msg: info[1][0].color_msg
+			})
+    })
+    .catch(error => {
+        // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+    });
+	
+});
+
+//home/pick-color - post request
+app.post('/home/pick_color', function(req, res) {
+	var color_hex = req.body.color_hex;
+	var color_name = req.body.color_name;
+	var color_message = req.body.color_message;
+	var insert_statement = "INSERT INTO favorite_colors(hex_value, name, color_msg) VALUES('" + color_hex + "','" + 
+							color_name + "','" + color_message +"') ON CONFLICT DO NOTHING;";
+
+	var color_select = 'select * from favorite_colors;';
+	db.task('get-everything', task => {
+        return task.batch([
+            task.any(insert_statement),
+            task.any(color_select)
+        ]);
+    })
+    .then(info => {
+    	res.render('pages/home',{
+				my_title: "Home Page",
+				data: info[1],
+				color: color_hex,
+				color_msg: color_message
+			})
+    })
+    .catch(error => {
+        // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/home', {
+                title: 'Home Page',
+                data: '',
+                color: '',
+                color_msg: ''
+            })
+    });
+});
+
+//team stats page - get request
+app.get('/team_stats', function(req, res){
+	var games_query = 'SELECT * from football_games';
+	var wins_query = 'SELECT COUNT(*) from football_games where home_score > visitor_score';
+	var losses_query = 'SELECT COUNT(*) from football_games where home_score < visitor_score';
+	db.task('get-everything', task =>{
+		return task.batch([
+			task.any(games_query),
+			task.any(wins_query),
+			task.any(losses_query)
+			]);
+	})
+	.then(info => {
+		// console.log(info[0]);
+		// console.log(info[1]);
+		// console.log(info[2]);
+		res.render('pages/team_stats', {
+			my_title: 'Season Stats',
+			game_info: info[0],
+			wins: info[1],
+			losses: info[2]
+		})
+	})
+	.catch(error => {
+        // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/team_stats', {
+                title: 'Season Stats',
+                game_info: '',
+                wins: '',
+                losses: ''
+    		})
+    });
+});
+
+//football player page - get request
+app.get('/player_info', function(req, res){
+	var query = 'select id, name from football_players';
+	db.any(query)
+        .then(function (info) {
+        	console.log(info);
+            res.render('pages/player_info',{
+				my_title: "Player Information",
+				data: info
+			})
+
+        })
+        .catch(function (err) {
+            // display error message in case an error
+            request.flash('error', err);
+            result.render('pages/player_info', {
+                title: 'Player Information',
+                data: ''
+            })
+        });
+});
 
 app.listen(3000);
 console.log('3000 is the magic port');
