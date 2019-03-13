@@ -41,29 +41,47 @@
 							<!-- TODO: Set Player Information
 							 			If a player has been selected, fill in their information in each of the fields below.
 							 		    You'll need to calculate here the player's average rushing, receiving, and passing yards.-->
+							<%
+								if(player_data && player_games){
+									var games_played = player_games.count;
+									var year = player_data.year;
+									var major = player_data.major;
+									var passing_yards = player_data.passing_yards;
+									var rushing_yards = player_data.rushing_yards;
+									var receiving_yards = player_data.receiving_yards;
+									var avg_passing_yards = passing_yards/games_played;
+									avg_passing_yards = avg_passing_yards.toFixed(3);
+									var avg_rushing_yards = rushing_yards/games_played;
+									avg_rushing_yards = avg_rushing_yards.toFixed(3);
+									var avg_receiving_yards = receiving_yards/games_played;
+									avg_receiving_yards = avg_receiving_yards.toFixed(3);
+								%>
 							<th>Year</th>
-							<td>	</td>
+							<td><%- player_data.year %></td>
 						</tr>
 						<tr>
 							<th>Major</th>
-							<td>	</td>
+							<td><%- major %></td>
 						</tr>
 						<tr>
 							<th>Games Played</th>
-							<td>	</td>
+							<td><%- games_played %></td>
 						</tr>
 						<tr>
-							<td>Passing Yards: </td>
-							<td>Avg. Passing Yards: </td>
+							<td>Passing Yards: <%- passing_yards %></td>
+							<td>Avg. Passing Yards: <%- avg_passing_yards %></td>
 						</tr>
 						<tr>
-							<td>Rushing Yards: </td>
-							<td>Avg. Rushing Yards: </td>
+							<td>Rushing Yards: <%- rushing_yards %></td>
+							<td>Avg. Rushing Yards: <%- avg_rushing_yards %></td>
 						</tr>
 						<tr>
-							<td>Receiving Yards: </td>
-							<td>Avg. Receiving Yards: </td>
+							<td>Receiving Yards: <%- receiving_yards %></td>
+							<td>Avg. Receiving Yards: <%- avg_receiving_yards %></td>
 						</tr>
+						<%
+							}
+						%>
 					</table>
 				</div>
 			</div>
